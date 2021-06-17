@@ -2,18 +2,25 @@ import React from 'react';
 import Loading from './Loading';
 import * as Location from 'expo-location';
 import { Alert } from 'react-native';
-
+import { API_KEY } from './Api';
+import axios from 'axios';
 export default class extends React.Component {
     state = {
         isLoading: true,
     };
+    getWeather = async (latitude, longitude) => {
+        const { data } = await axios.get(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}`
+        );
+        console.log(data);
+    };
     getLocation = async () => {
         try {
             await Location.requestPermissionsAsync();
-            // console.log(response);
             const {
                 coords: { latitude, longitude },
             } = await Location.getCurrentPositionAsync();
+            this.getWeather(latitude, longitude);
             this.setState({ isLoading: false });
         } catch (e) {
             Alert.alert('너를 찾을수 없습니다');
