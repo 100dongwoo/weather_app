@@ -1,28 +1,31 @@
-import {StatusBar} from 'expo-status-bar';
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import Loading from './Loading';
+import * as Location from 'expo-location';
+import { Alert } from 'react-native';
 
-export default function App() {
-    return (
-        <View style={styles.container}>
-            <Text>asd</Text>
-            <View style={styles.yellowView}/>
-            <View style={styles.blueView}/>
-            <StatusBar style="auto"/>
-        </View>
-    );
-}
+export default class extends React.Component {
+    state = {
+        isLoading: true,
+    };
+    getLocation = async () => {
+        try {
+            await Location.requestPermissionsAsync();
+            // console.log(response);
+            const {
+                coords: { latitude, longitude },
+            } = await Location.getCurrentPositionAsync();
+            this.setState({ isLoading: false });
+        } catch (e) {
+            Alert.alert('너를 찾을수 없습니다');
+        }
+    };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    yellowView: {
-        flex: 1,
-        backgroundColor: "yellow"
-    },
-    blueView: {
-        flex: 1,
-        backgroundColor: "blue"
+    componentDidMount() {
+        this.getLocation();
     }
-});
+
+    render() {
+        const { isLoading } = this.state;
+        return isLoading ? <Loading /> : null;
+    }
+}
